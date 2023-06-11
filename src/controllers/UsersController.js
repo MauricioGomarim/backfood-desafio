@@ -39,7 +39,7 @@ class UsersController {
 
     async update(request, response) {
         const {name, email, password, old_password } = request.body;
-        const { user_id }= request.params;
+        const user_id = request.user.id;
 
         // Coneção com o banco
         const database = await sqliteConnection();
