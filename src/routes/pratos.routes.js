@@ -13,6 +13,8 @@ pratosRoutes.post("/", upload.single("image"), pratosController.create);
 pratosRoutes.get("/", pratosController.index);
 pratosRoutes.get("/:id", pratosController.show);
 pratosRoutes.put("/:id", pratosController.update);
+pratosRoutes.delete("/:id", pratosController.delete);
+
 
 
 module.exports = pratosRoutes;

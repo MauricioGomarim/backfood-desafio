@@ -98,6 +98,7 @@ class PratosController {
     return response.status(201).json();
   }
 
+
   async show(request, response) {
     // Pegando o id
     const { id } = request.params;
@@ -149,6 +150,14 @@ async index(request, response) {
       }
   })
   return response.status(200).json(pratosComIngradients);
+}
+
+async delete(request, response) {
+  const { id } = request.params;
+ 
+  await knex("pratos").where({ id }).delete();
+
+  return response.status(201).json();
 }
 }
 
