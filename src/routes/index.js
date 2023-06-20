@@ -4,6 +4,8 @@ const { Router } = require('express');
 const usersRouter = require("./users.routes");
 const sessionsRoutes = require("./sessions.routes");
 const pratosRoutes = require("./pratos.routes");
+const ordersRouter = require("./orders.routes");
+
 
 
 
@@ -14,6 +16,7 @@ const routes = Router();
 routes.use("/users", usersRouter);
 routes.use("/sessions", sessionsRoutes);
 routes.use("/pratos", pratosRoutes);
+routes.use("/orders", ordersRouter);
 
 
 // Exportando
