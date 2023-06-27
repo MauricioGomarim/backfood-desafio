@@ -10,7 +10,7 @@ class OrdersController {
 
 
 
-        // Inserting Order infos into the database
+       //  Inserting Order infos into the database //
         const [order_id] = await knex("orders").insert({
             orderStatus,
             totalPrice,
