@@ -6,8 +6,7 @@ exports.up = knex => knex.schema.createTable("orders", table => {
     table.text("orderStatus");
     table.text("totalPrice");
     table.text("paymentMethod");
-
-    table.timestamp('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+    table.timestamp('created_at').default(knex.fn.now());
 });
 
 exports.down = knex => knex.schema.dropTable("orders");

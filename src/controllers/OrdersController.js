@@ -7,15 +7,14 @@ class OrdersController {
         // Capturing Body Parameters and ID Parameters
         const { cart, orderStatus, totalPrice, paymentMethod } = request.body;
         const user_id = request.user.id;
-        const brTimeZone = "America/Sao_Paulo";
-        const currentDateTime = moment().tz(brTimeZone).format("YYYY-MM-DD HH:mm:ss");
+
+
 
         // Inserting Order infos into the database
         const [order_id] = await knex("orders").insert({
             orderStatus,
             totalPrice,
             paymentMethod,
-            created_at: currentDateTime,
             user_id
         });
 
