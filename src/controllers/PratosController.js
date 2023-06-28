@@ -172,8 +172,9 @@ class PratosController {
 
   async delete(request, response) {
     const { id } = request.params;
+
     const dish = await knex("pratos").where({ id }).first();
-    
+
     const diskStorage = new DiskStorage();
     await diskStorage.deleteFile(dish.image);
 
