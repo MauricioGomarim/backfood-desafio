@@ -1,21 +1,21 @@
 // Hash, App Error and SQLite Connection Import
 const AppError = require("../utils/AppError");
 const knex = require("../database/knex");
-const DiskStorage = require("../providers/DiskStorage")
+const DiskStorage = require("../providers/DiskStorage");
 
 class PratosController {
   async create(request, response) {
     // Capturing Body Parameters
-    const {title, description, category, price, ingredients } = request.body;
+    const { title, description, category, price, ingredients } = request.body;
 
-      // Solicitando nome da imagem
-      const imageFileName = request.file.filename;
+    // Solicitando nome da imagem
+    const imageFileName = request.file.filename;
 
-      // Instanciando diskStorage
-      const diskStorage = new DiskStorage()
+    // Instanciando diskStorage
+    const diskStorage = new DiskStorage();
 
-      // Saving image file
-      const filename = await diskStorage.saveFile(imageFileName);
+    // Saving image file
+    const filename = await diskStorage.saveFile(imageFileName);
 
     // // Connection with Database
     const checkPratoExist = await knex("pratos").where({ title }).first();
@@ -30,7 +30,7 @@ class PratosController {
       description,
       category,
       price,
-      image: filename
+      image: filename,
     });
 
     // Verificando se o prato tem apenas um ingrediente e inserindo as informações no banco de dados
@@ -64,8 +64,22 @@ class PratosController {
     const { title, description, category, price, ingredients } = request.body;
     const { id } = request.params;
 
+    // // ?. é um operador channel, que verifica se existe o filename dentro de file
+    const imageFileName = request.file?.filename;
+
+    // Instantiating diskStorage
+    const diskStorage = new DiskStorage();
+
+    // // Getting the dish data through the informed ID
     const dish = await knex("pratos").where({ id }).first();
 
+    // Deleting the old image if a new image is uploaded and saving the new image
+    if (imageFileName != null || imageFileName != undefined ) {
+      await diskStorage.deleteFile(dish.image);
+      const filename = await diskStorage.saveFile(imageFileName);
+      dish.image = filename ?? dish.image;
+    }
+     
     dish.title = title ?? dish.title;
     dish.description = description ?? dish.description;
     dish.category = category ?? dish.category;
@@ -94,71 +108,75 @@ class PratosController {
     await knex("ingredients").where({dish_id: id}).delete();
     await knex("ingredients").where({dish_id: id}).insert(ingredientsInsert);
 
-
     return response.status(201).json();
   }
-
 
   async show(request, response) {
     // Pegando o id
     const { id } = request.params;
 
     const dish = await knex("pratos").where({ id }).first();
-    const ingredients = await knex("ingredients").where({ dish_id: id }).orderBy("name");
+    const ingredients = await knex("ingredients")
+      .where({ dish_id: id })
+      .orderBy("name");
 
     return response.status(201).json({
-        ...dish,
-        ingredients
+      ...dish,
+      ingredients,
     });
-}
-
-async index(request, response) {
-  // Capturing Query Parameters
-  const { title, ingredients } = request.query;
-
-  let pratos;
-
-  if (ingredients) {
-      const filterIngredients = ingredients.split(',').map(ingredient => ingredient.trim());
-      
-      pratos = await knex("ingredients")
-          .select([
-              "pratos.id",
-              "pratos.title",
-              "pratos.description",
-              "pratos.category",
-              "pratos.price",
-              "pratos.image",
-          ])
-          .whereLike("pratos.title", `%${title}%`)
-          .whereIn("name", filterIngredients)
-          .innerJoin("pratos", "pratos.id", "ingredients.dish_id")
-          .groupBy("pratos.id")
-          .orderBy("pratos.title")
-  } else {
-      pratos = await knex("pratos")
-          .whereLike("title", `%${title}%`)
-          .orderBy("title");
   }
-      
-  const ingredientsPratos = await knex("ingredients") 
-  const pratosComIngradients = pratos.map(prato => {
-      const ingredientPrato = ingredientsPratos.filter(ingredient => ingredient.dish_id === prato.id);
+
+  async index(request, response) {
+    // Capturing Query Parameters
+    const { title, ingredients } = request.query;
+
+    let pratos;
+
+    if (ingredients) {
+      const filterIngredients = ingredients
+        .split(",")
+        .map((ingredient) => ingredient.trim());
+
+      pratos = await knex("ingredients")
+        .select([
+          "pratos.id",
+          "pratos.title",
+          "pratos.description",
+          "pratos.category",
+          "pratos.price",
+          "pratos.image",
+        ])
+        .whereLike("pratos.title", `%${title}%`)
+        .whereIn("name", filterIngredients)
+        .innerJoin("pratos", "pratos.id", "ingredients.dish_id")
+        .groupBy("pratos.id")
+        .orderBy("pratos.title");
+    } else {
+      pratos = await knex("pratos")
+        .whereLike("title", `%${title}%`)
+        .orderBy("title");
+    }
+
+    const ingredientsPratos = await knex("ingredients");
+    const pratosComIngradients = pratos.map((prato) => {
+      const ingredientPrato = ingredientsPratos.filter(
+        (ingredient) => ingredient.dish_id === prato.id
+      );
       return {
-          ...prato,
-          ingredients: ingredientPrato
-      }
-  })
-  return response.status(200).json(pratosComIngradients);
-}
+        ...prato,
+        ingredients: ingredientPrato,
+      };
+    });
+    return response.status(200).json(pratosComIngradients);
+  }
 
-async delete(request, response) {
-  const { id } = request.params;
- 
-  await knex("pratos").where({ id }).delete();
+  async delete(request, response) {
+    const { id } = request.params;
 
-  return response.status(201).json();
-}
+    await knex("pratos").where({ id }).delete();
+
+    return response.status(201).json();
+  }
 }
 
 module.exports = PratosController;

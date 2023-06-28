@@ -1,10 +1,10 @@
-const patch = require("path");
+const path = require("path");
 // LIB DE UPLOADS
 const multer = require("multer");
 const crypto = require("crypto");
 
-const TMP_FOLDER = patch.resolve(__dirname, "..", "..", "tmp");
-const UPLOAD_FOLDER = patch.resolve(TMP_FOLDER, "uploads");
+const TMP_FOLDER = path.resolve(__dirname, "..", "..", "tmp");
+const UPLOAD_FOLDER = path.resolve(TMP_FOLDER, "uploads");
 
 const MULTER = {
     storage: multer.diskStorage({
@@ -13,9 +13,9 @@ const MULTER = {
             // Gerando uma sequencia de caracteres
             const fileHash = crypto.randomBytes(10).toString("hex");
             // Concatenando a sequencia de caracteres com o nome do arquivo
-            const fileName = `${fileHash}-${file.originalname}`;
+            const filename = `${fileHash}-${file.originalname}`;
 
-            return callback(null, fileName)
+            return callback(null, filename)
         }
     })
 }
@@ -25,3 +25,7 @@ module.exports = {
     UPLOAD_FOLDER,
     MULTER
 }
+
+
+
+
