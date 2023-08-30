@@ -7,7 +7,7 @@ class PratosController {
   async create(request, response) {
     // Capturing Body Parameters
     const { title, description, category, price, ingredients } = request.body;
-
+    /*
     // Solicitando nome da imagem
     const imageFileName = request.file.filename;
 
@@ -16,7 +16,7 @@ class PratosController {
 
     // Saving image file
     const filename = await diskStorage.saveFile(imageFileName);
-
+    */
     // // Connection with Database
     const checkPratoExist = await knex("pratos").where({ title }).first();
 
@@ -30,7 +30,7 @@ class PratosController {
       description,
       category,
       price,
-      image: filename,
+      /*image: filename,*/
     });
 
     // Verificando se o prato tem apenas um ingrediente e inserindo as informações no banco de dados
